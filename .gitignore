@@ -17,3 +17,6 @@ vector_store/
 # Operating system
 .DS_Store
 Thumbs.db
+
+# PR4 Copilot hook diagnosis (tool names/argument keys only)
+.github/hooks/hook-debug.log
