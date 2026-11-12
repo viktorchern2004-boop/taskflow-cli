@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+from pathlib import Path
 from typing import Any
 
 _COMMAND_TOOLS = {"bash", "powershell", "terminal", "run_in_terminal", "run_command", "execute", "run_terminal_command"}
@@ -100,7 +101,26 @@ def check(event: dict[str, Any]) -> dict[str, str]:
     return {}
 
 
+
+def _record_non_sensitive(event: dict[str, Any], result: dict[str, str]) -> None:
+    """Temporary diagnostic: store tool name and argument KEY NAMES only, never values."""
+    try:
+        args = _arguments(event)
+        record = {
+            "toolName": str(event.get("toolName", event.get("tool_name", "<missing>")))[:120],
+            "argumentKeys": sorted(str(key)[:80] for key in args)[:25],
+            "decision": result.get("permissionDecision", "none"),
+        }
+        log = Path(__file__).resolve().parents[1] / ".github" / "hooks" / "hook-debug.log"
+        with log.open("a", encoding="utf-8") as stream:
+            stream.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except (OSError, TypeError, ValueError):
+        # The security decision must not depend on a diagnostic file.
+        pass
+
+
 def main() -> int:
+    event: dict[str, Any] = {}
     try:
         event = json.load(sys.stdin)
         if not isinstance(event, dict):
@@ -108,6 +128,7 @@ def main() -> int:
         result = check(event)
     except (ValueError, TypeError, json.JSONDecodeError) as exc:
         result = _decision("deny", "B00", f"Invalid hook payload: {type(exc).__name__}")
+    _record_non_sensitive(event, result)
     print(json.dumps(result, ensure_ascii=False))
     return 0
 
