@@ -12,3 +12,6 @@
 1 – Ontology-TaskFlow та категорії; 2 – типізовані зв'язки YAML у Obsidian; 3 – guardrails allow/warn/block; 4 – зареєстрований hook; 5 – реальна відмова `deny`; 6 – реальний запит `ask`; 7 – виконані тести.
 
 **Обмеження:** локальний Python launcher `py -3` обов'язковий для hook; перевірка у VS Code необхідна, навіть якщо локальні unit-тести проходять. Документація: https://code.visualstudio.com/docs/agent-customization/hooks.
+
+## Якщо dry-run push не заблоковано
+Це НЕ успіх B01. Спочатку перевірте `hook-debug.log` після нового сеансу Copilot (після `git pull`). Скрипт зберігає **лише назву інструмента, назви ключів аргументів і власне рішення**, без значень команд чи секретів. У PowerShell: `Get-Content .github/hooks/hook-debug.log -Tail 15`. Якщо файла немає, Copilot не викликає скрипт або не може його запустити: перевірте вибраний Session Target, виконання в локальному workspace та журнал Hooks. Якщо є рядок із рішенням `none`, надішліть назву інструмента й ключі – потрібно узгодити перевірку з реальною схемою. Перевіряйте тільки командою `git push --dry-run origin main` через Copilot, ніколи прямим push.
