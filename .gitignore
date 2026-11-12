@@ -20,3 +20,6 @@ Thumbs.db
 
 # PR4 Copilot hook diagnosis (tool names/argument keys only)
 .github/hooks/hook-debug.log
+
+# Packaging metadata
+*.egg-info/
